@@ -27,12 +27,13 @@ def my_agent(obs, config):
         B = 100
         C = 20
         D = -21
-        E = -101
+        E = -1 * 10**5 
         num_twos = count_windows(grid, 2, mark, config)
         num_threes = count_windows(grid, 3, mark, config)
-        num_fours = count_windows(grid, 4, mark, config)
+        num_fours = count_windows(grid, 4, mark, config) #you win 
         num_twos_opp = count_windows(grid, 2, mark%2+1, config)
         num_threes_opp = count_windows(grid, 3, mark%2+1, config)
+        num_fours_opp = count_windows(grid, 4, mark%2+1, config) # opponent wins 
         score = A*num_fours + B*num_threes + C*num_twos + D*num_twos_opp + E*num_threes_opp
         return score
     
