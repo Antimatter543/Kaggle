@@ -9,7 +9,7 @@ def my_agent(obs, config):
     # Calculates score if agent drops piece in selected column
     def score_move(grid, col, mark, config):
         next_grid = drop_piece(grid, col, mark, config)
-        score = get_heuristic(next_grid, col, mark, config)
+        score = get_heuristic(next_grid, mark, config)
         return score
 
     # Helper function for score_move: gets board at next step if agent drops piece in selected column
@@ -22,7 +22,7 @@ def my_agent(obs, config):
         return next_grid
 
     ## HEURISTIC GET; Helper function for score_move: calculates value of heuristic for grid
-    def get_heuristic(grid, col, mark, config):
+    def get_heuristic(grid, mark, config):
         A = 1 * 10 **6
         B = 100
         C = 20
