@@ -1,7 +1,6 @@
 def my_agent(obs, config):
-    """Alphabeta pruning minimax pog."""
     # How deep to make the game tree: higher values take longer to run!
-    N_STEPS = 7
+    N_STEPS = 8
     ################################
     # Imports and helper functions #
     ################################
@@ -12,7 +11,7 @@ def my_agent(obs, config):
     # Uses minimax to calculate value of dropping piece in selected column
     def score_move(grid, col, mark, config, nsteps):
         next_grid = drop_piece(grid, col, mark, config)
-        score = alphaBeta(next_grid, nsteps-1, -np.Inf, np.Inf, True, mark, config)
+        score = minimax(next_grid, nsteps-1, -np.Inf, np.Inf, False, mark, config)
         return score
     
     # Helper function for score_move: gets board at next step if agent drops piece in selected column
@@ -102,37 +101,32 @@ def my_agent(obs, config):
                 if is_terminal_window(window, config):
                     return True
         return False
-    
-    def alphaBeta(node, depth, a, B, maximisingPlayer, mark, config):# CUSTOM MADE (well... 'Translated' from pseudocode)
-        ## WE ARE MAX. OPPONENT IS MIN. We want to maximise our score, the opponent wants to minimise it.
-        # Imagine Chess: We're white (max), black is black (min).
-        # Great vid explaining minimax + alphabeta pruning https://www.youtube.com/watch?v=l-hh51ncgDI
+
+    # Minimax implementation
+    def minimax(node, depth, a, b, maximizingPlayer, mark, config):
         is_terminal = is_terminal_node(node, config)
         valid_moves = [c for c in range(config.columns) if node[0][c] == 0]
-        if depth == 0 or is_terminal: # is_terminal asks if the game is over.
-            return get_heuristic(node, mark, config)  #Returns static evaluation of this position
-        
-        if maximisingPlayer: # If it's our turn to move -- we want to find max evaluation
-            maxEval = -np.Inf 
-            for column in valid_moves:# Loop through all positions that can be reached in 1 move (only 7 columns)
-                value = alphaBeta(value, depth -1, a, B, False)
-                maxEval = max(maxEval, value) # Whichever is larger between -infinite (loss) and that
+        if depth == 0 or is_terminal:
+            return get_heuristic(node, mark, config)
+        if maximizingPlayer:
+            value = -np.Inf
+            for col in valid_moves:
+                child = drop_piece(node, col, mark, config)
+                value = max(value, minimax(child, depth-1, a, b, False, mark, config))
                 a = max(a, value)
                 if b <= a:
                     break
-                return maxEval
-        
-        else: # If it's our turn to move -- we want to find max evaluation
-            minEval = np.Inf 
-            for column in valid_moves: # Loop through all positions that can be reached in 1 move (only 7 columns)
-                value = alphaBeta(value, depth -1, a, B, True)
-                minEval = min(minEval, value) # Whichever is larger between -infinite (loss) and that
+            return value
+        else:
+            value = np.Inf
+            for col in valid_moves:
+                child = drop_piece(node, col, mark%2+1, config)
+                value = min(value, minimax(child, depth-1, a, b, True, mark, config))
                 b = min(b, value)
                 if b <= a:
                     break
-                return minEval
-            
-            
+            return value
+    
     #####################
     # GAME STUFF
     #####################
